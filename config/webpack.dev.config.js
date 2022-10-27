@@ -116,7 +116,21 @@ module.exports = {
   devServer: {
     host: 'localhost', // 域名
     port: '3000', // 端口号
-    open: true // 自动打开浏览器
+    open: true, // 自动打开浏览器
+    /* 
+      开启 HMR 功能: 每次打包运行只打包替换修改的模块，不用全部打包
+      webpack5 默认开启 webpack4 需要手动开启
+      css 中可以生效 style-loader 实现了 HMR 功能
+      js 中不会生效:
+        单个 js 文件可以: 
+          if (module.hot) {
+            // 判断是否支持模块热替换功能
+            module.hot.accept('./js/count');
+            module.hot.accept('./js/sum');
+          }
+        多个 js 文件: 使用 vue-loader 或者 react-hot-loader
+    */
+    hot: true
   },
 
   // 模式
