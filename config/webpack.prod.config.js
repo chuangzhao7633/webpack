@@ -13,7 +13,7 @@ module.exports = {
       文件输出路径 (所有文件)
         __dirname nodejs 变量，代表当前文件的文件夹目录
     */
-    path: path.resolve(__dirname, 'dist'), // 绝对路径 (其他资源打包输出目录)
+    path: path.resolve(__dirname, '../dist'), // 绝对路径 (其他资源打包输出目录)
     // 文件名 (入口文件打包输出文件名)
     filename: 'static/js/main.js',
     /* 
@@ -100,24 +100,17 @@ module.exports = {
     */
     new EslintPlugin({
       // 检测那些文件
-      context: path.resolve(__dirname, 'src')
+      context: path.resolve(__dirname, '../src')
     }),
     new HtmlWebpackPlugin({
       /* 
         模板: 以 public/index.html 文件为模板创建新的 html 文件
         新的 html 文件的特点: 1. 结构和原来一致 2. 自动引入打包输出的资源
       */
-      template: path.resolve(__dirname, 'public/index.html')
+      template: path.resolve(__dirname, '../public/index.html')
     })
   ],
 
-  // 开发服务器
-  devServer: {
-    host: 'localhost', // 域名
-    port: '3000', // 端口号
-    open: true // 自动打开浏览器
-  },
-
   // 模式
-  mode: 'development'
+  mode: 'production'
 }
