@@ -111,6 +111,13 @@ module.exports = {
     })
   ],
 
+  // 开发服务器
+  devServer: {
+    host: 'localhost', // 域名
+    port: '3000', // 端口号
+    open: true // 自动打开浏览器
+  },
+
   // 模式
   mode: 'development'
 }
