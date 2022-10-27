@@ -87,5 +87,15 @@ module.exports = {
   ],
 
   // 生产环境开启: 默认开启 html 和 js 压缩，所以只需要单独配置 css 压缩
-  mode: 'production'
+  mode: 'production',
+
+  /* 
+    生产环境: 源代码是否隐藏 调试是否友好
+      内联会让代码体积变大 所以生产环境不使用内联
+      nosources-source-map 全部隐藏
+      hidden-source-map 只隐藏源代码, 只能提示到构建后代码的错误位置
+
+      综合 source-map / cheap-module-source-map
+  */
+  devtool: 'source-map'
 }
