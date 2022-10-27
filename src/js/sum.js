@@ -1,0 +1,1 @@
+export default (...args) => args.reduce((preValue, curValue) => preValue + curValue, 0);
