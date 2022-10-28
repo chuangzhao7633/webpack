@@ -86,7 +86,12 @@ module.exports = {
                       作用: 提升打包构建的速度
                   */
                   cacheDirectory: true, // 开启 babel 缓存
-                  cacheCompression: false // 关闭缓存文件压缩 压缩会影响构建速度
+                  cacheCompression: false, // 关闭缓存文件压缩 压缩会影响构建速度
+                  /* 
+                    babel 会对每个编译文件添加辅助代码，每个文件都会重复定义，增加了代码体积
+                    @babel/plugin-transform-runtime 内置了这些辅助代码，编译的文件引入即可，不会重复定义，减少了代码体积
+                  */
+                  plugins: ['@babel/plugin-transform-runtime']
                 }
               }
             ]
@@ -133,7 +138,10 @@ module.exports = {
     ]
   },
 
-  // 生产环境开启: 默认开启 html 和 js 压缩，所以只需要单独配置 css 压缩
+  /* 
+    生产环境开启: 默认开启 html 和 js 压缩，所以只需要单独配置 css 压缩
+    生产环境下自动开启 treeshaking 通过 es6 方式引入的模块，构建打包时只引入用到的函数、对象 减少代码体积
+  */
   mode: 'production',
 
   /* 
