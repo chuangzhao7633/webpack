@@ -1,7 +1,10 @@
+const os = require('os');
 // nodejs 核心模块，专门用来处理路径问题
 const path = require('path');
 const EslintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+const threads = os.cpus().length; // cpu 核心数
 
 module.exports = {
   // 入口
@@ -85,20 +88,30 @@ module.exports = {
             // exclude: /node_modules/, // 排除 node_modules 中的 js 文件
             // exclude: /node_modules/, // 除了 node_modules 下的文件，其他文件都处理
             include: path.resolve(__dirname, '../src'), // 只处理 src 下的文件，其他文件不处理
-            loader: 'babel-loader',
-            options: {
-              /* presets: [
-                '@babel/preset-env', // 智能预设 可以解析 es6 语法
-                '@babel/preset-react',
-                '@babel/preset-typescript'
-              ] */
-              /* 
-                babel 缓存，第二次构建时只构建更改的 js 模块，未更改的使用之前的缓存
-                  作用: 提升打包构建的速度
-              */
-              cacheDirectory: true, // 开启 babel 缓存
-              cacheCompression: false // 关闭缓存文件压缩 压缩会影响构建速度
-            }
+            use: [
+              {
+                loader: 'thread-loader', // 开启多进程对 babel 进行处理
+                options: {
+                  works: threads // 进程数量
+                }
+              },
+              {
+                loader: 'babel-loader',
+                options: {
+                  /* presets: [
+                    '@babel/preset-env', // 智能预设 可以解析 es6 语法
+                    '@babel/preset-react',
+                    '@babel/preset-typescript'
+                  ] */
+                  /* 
+                    babel 缓存，第二次构建时只构建更改的 js 模块，未更改的使用之前的缓存
+                      作用: 提升打包构建的速度
+                  */
+                  cacheDirectory: true, // 开启 babel 缓存
+                  cacheCompression: false // 关闭缓存文件压缩 压缩会影响构建速度
+                }
+              }
+            ]
           }
         ]
       }
@@ -115,7 +128,10 @@ module.exports = {
     new EslintPlugin({
       // 检测那些文件
       context: path.resolve(__dirname, '../src'),
-      exclude: 'node_modules' // 默认值
+      exclude: 'node_modules', // 默认值
+      cache: true, // 开启缓存
+      cacheLocation: path.resolve(__dirname, '../node_modules/.cache/eslintcache'),
+      threads // 开启多进程和进程数量处理 Eslint
     }),
     new HtmlWebpackPlugin({
       /* 
