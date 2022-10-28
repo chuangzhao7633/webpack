@@ -30,64 +30,77 @@ module.exports = {
     rules: [
       // loader 配置
       {
-        test: /\.css$/, // 只检测 css 文件
-        use: [
-          // 执行顺序: 从右到左
-          'style-loader',// 将 js 中 css 通过创建 style 标签添加到 html 文件中生效
-          'css-loader' // 将 css 资源编译成 commonjs 的模块到 js 中
-        ]
-      },
-      {
-        test: /\.less$/,
-        /* loader: 'less-loader', */
-        use: [
-          'style-loader',
-          'css-loader',
-          'less-loader' // 将 less 文件转换为 css
-        ]
-      }, 
-      {
-        /* 
-          图片资源的处理: webpack5 之前需要 url-loader file-loader
-            webpack5 后直接内置到 webpack 中
-        */
-        test: /\.(png|jpe?g|gif|webp|svg)$/,
-        type: 'asset',
-        parser: { // 解析资源
-          dataUrlCondition: {
+        // 打包文件只被当中一个处理，找到后就不再往下找
+        oneOf: [
+          {
+            test: /\.css$/, // 只检测 css 文件
+            use: [
+              // 执行顺序: 从右到左
+              'style-loader',// 将 js 中 css 通过创建 style 标签添加到 html 文件中生效
+              'css-loader' // 将 css 资源编译成 commonjs 的模块到 js 中
+            ]
+          },
+          {
+            test: /\.less$/,
+            /* loader: 'less-loader', */
+            use: [
+              'style-loader',
+              'css-loader',
+              'less-loader' // 将 less 文件转换为 css
+            ]
+          }, 
+          {
             /* 
-              小于 10kb 的图片转为 dataUrlCondition(base64)
-                优点: 减少请求数量
-                缺点: 体积增大
+              图片资源的处理: webpack5 之前需要 url-loader file-loader
+                webpack5 后直接内置到 webpack 中
             */
-            maxSize: 10 * 1024
+            test: /\.(png|jpe?g|gif|webp|svg)$/,
+            type: 'asset',
+            parser: { // 解析资源
+              dataUrlCondition: {
+                /* 
+                  小于 10kb 的图片转为 dataUrlCondition(base64)
+                    优点: 减少请求数量
+                    缺点: 体积增大
+                */
+                maxSize: 10 * 1024
+              }
+            },
+            generator: {
+              // 输出图片名称
+              filename: 'static/images/[name][hash:8][ext][query]'
+            }
+          },
+          {
+            // 其他资源处理
+            test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
+            type: 'asset/resource',
+            generator: {
+              // 输出图片名称
+              filename: 'static/media/[name][hash:8][ext][query]'
+            }
+          },
+          {
+            test: /\.(js|jsx)$/,
+            // exclude: /node_modules/, // 排除 node_modules 中的 js 文件
+            // exclude: /node_modules/, // 除了 node_modules 下的文件，其他文件都处理
+            include: path.resolve(__dirname, '../src'), // 只处理 src 下的文件，其他文件不处理
+            loader: 'babel-loader',
+            options: {
+              /* presets: [
+                '@babel/preset-env', // 智能预设 可以解析 es6 语法
+                '@babel/preset-react',
+                '@babel/preset-typescript'
+              ] */
+              /* 
+                babel 缓存，第二次构建时只构建更改的 js 模块，未更改的使用之前的缓存
+                  作用: 提升打包构建的速度
+              */
+              cacheDirectory: true, // 开启 babel 缓存
+              cacheCompression: false // 关闭缓存文件压缩 压缩会影响构建速度
+            }
           }
-        },
-        generator: {
-          // 输出图片名称
-          filename: 'static/images/[name][hash:8][ext][query]'
-        }
-      },
-      {
-        // 其他资源处理
-        test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
-        type: 'asset/resource',
-        generator: {
-          // 输出图片名称
-          filename: 'static/media/[name][hash:8][ext][query]'
-        }
-      },
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/, // 排除 node_modules 中的 js 文件
-        loader: 'babel-loader',
-        /* options: {
-          presets: [
-            '@babel/preset-env', // 智能预设 可以解析 es6 语法
-            '@babel/preset-react',
-            '@babel/preset-typescript'
-          ]
-        } */
+        ]
       }
     ]
   },
@@ -101,7 +114,8 @@ module.exports = {
     */
     new EslintPlugin({
       // 检测那些文件
-      context: path.resolve(__dirname, '../src')
+      context: path.resolve(__dirname, '../src'),
+      exclude: 'node_modules' // 默认值
     }),
     new HtmlWebpackPlugin({
       /* 

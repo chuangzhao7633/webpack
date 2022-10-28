@@ -34,43 +34,59 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.css$/,
-        use: getStyleLoader()
-      },
-      {
-        test: /\.less$/,
-        use: [...getStyleLoader(), 'less-loader']
-      }, 
-      {
-        test: /\.(png|jpe?g|gif|webp|svg)$/,
-        type: 'asset',
-        parser: {
-          dataUrlCondition: {
-            maxSize: 10 * 1024
+        oneOf: [
+          {
+            test: /\.css$/,
+            use: getStyleLoader()
+          },
+          {
+            test: /\.less$/,
+            use: [...getStyleLoader(), 'less-loader']
+          }, 
+          {
+            test: /\.(png|jpe?g|gif|webp|svg)$/,
+            type: 'asset',
+            parser: {
+              dataUrlCondition: {
+                maxSize: 10 * 1024
+              }
+            },
+            generator: {
+              filename: 'static/images/[name][hash:8][ext][query]'
+            }
+          },
+          {
+            test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
+            type: 'asset/resource',
+            generator: {
+              filename: 'static/media/[name][hash:8][ext][query]'
+            }
+          },
+          {
+            test: /\.(js|jsx)$/,
+            // exclude: /node_modules/, // 除了 node_modules 下的文件，其他文件都处理
+            include: path.resolve(__dirname, '../src'), // 只处理 src 下的文件，其他文件不处理
+            loader: 'babel-loader',
+            options: {
+              /* 
+                babel 缓存，第二次构建时只构建更改的 js 模块，未更改的使用之前的缓存
+                  作用: 提升打包构建的速度
+              */
+              cacheDirectory: true, // 开启 babel 缓存
+              cacheCompression: false // 关闭缓存文件压缩 压缩会影响构建速度
+            }
           }
-        },
-        generator: {
-          filename: 'static/images/[name][hash:8][ext][query]'
-        }
-      },
-      {
-        test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
-        type: 'asset/resource',
-        generator: {
-          filename: 'static/media/[name][hash:8][ext][query]'
-        }
-      },
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
+        ]
       }
     ]
   },
 
   plugins: [
     new EslintPlugin({
-      context: path.resolve(__dirname, '../src')
+      context: path.resolve(__dirname, '../src'),
+      exclude: 'node_modules', // 默认值
+      cache: true, // 开启缓存
+      cacheLocation: path.resolve(__dirname, '../node_modules/.cache/eslintcache')
     }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../public/index.html')
