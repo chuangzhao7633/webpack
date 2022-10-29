@@ -19,7 +19,11 @@ module.exports = {
     path: undefined, // 开发环境使用 devServer 不需要打包输出
     /* path: path.resolve(__dirname, 'dist'),  */// 绝对路径 (其他资源打包输出目录)
     // 文件名 (入口文件打包输出文件名)
-    filename: 'static/js/main.js',
+    filename: 'static/js/[name].js',
+    // 打包输出的其他文件命名
+    chunkFilename: 'static/js/[name].chunk.js',
+    // 通过 type: asset 方式处理的资源统一用这种命名方式
+    assetModuleFilename: 'static/media/[name][hash:8][ext][query]',
     /* 
       自动清空上次打包的内容
       原理: 在打包前，将 path: path.resolve(__dirname, 'dist') 整个目录清空，再进行打包
@@ -69,19 +73,19 @@ module.exports = {
                 maxSize: 10 * 1024
               }
             },
-            generator: {
+            /* generator: {
               // 输出图片名称
               filename: 'static/images/[name][hash:8][ext][query]'
-            }
+            } */
           },
           {
             // 其他资源处理
             test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
             type: 'asset/resource',
-            generator: {
+            /* generator: {
               // 输出图片名称
               filename: 'static/media/[name][hash:8][ext][query]'
-            }
+            } */
           },
           {
             test: /\.(js|jsx)$/,
