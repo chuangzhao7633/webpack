@@ -7,6 +7,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 // webpack 内置插件 生产环境自动压缩 js 代码依靠这个插件
 const TerserWebpackPlugin = require('terser-webpack-plugin');
 const PreloadWebpackPlugin = require('@vue/preload-webpack-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const threads = os.cpus().length; // cpu 核心数
 
@@ -139,6 +140,15 @@ module.exports = {
       /* rel: 'preload',
       as: 'script', */
       rel: 'prefetch'
+    }),
+    // PWA 离线状态下也可访问
+    new WorkboxPlugin.GenerateSW({
+      /* 
+        这些选项帮助快速启用 Serviceworks
+        不允许遗留任何旧的 Serviceworks
+      */
+      clientsClaim: true,
+      skipWaiting: true
     })
   ],
 
